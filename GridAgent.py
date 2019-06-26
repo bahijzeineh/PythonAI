@@ -12,16 +12,26 @@ class GridAgent:
         self.gridEnv = gridEnv
         self.startPos = start
         self.currentPos = start
-        self.positive=[]
-        self.negative=[]
+        self.positive = []
+        self.negative = []
+        self.discount = .9
+    
+        self.initExploredCells()
         
-        self.exploredCells = [[0] * gridEnv.columns for i in range(gridEnv.rows)]
-        for (x,y) in self.gridEnv.impassable:
-            self.exploredCells[y][x] = 1
-            
         self.checks = [self.canMoveUp, self.canMoveDown, self.canMoveLeft, self.canMoveRight]
         self.gets = [self.getUp, self.getDown, self.getLeft, self.getRight]
         self.actions = [self.moveUp, self.moveDown, self.moveLeft, self.moveRight]
+    
+    def initExploredCells(self, addRewards = False):
+        self.exploredCells = [[0] * self.gridEnv.columns for i in range(self.gridEnv.rows)]
+        for (x,y) in self.gridEnv.impassable:
+            self.exploredCells[y][x] = 1
+        if addRewards:
+            for (x,y) in self.positive:
+                self.exploredCells[y][x] = 1
+            for (x,y) in self.negative:
+                self.exploredCells[y][x] = 1
+            
     
     def canMoveUp(self):
         return self.currentPos[1] > 0 and not self.gridEnv.isImpassable(self.getUp())
@@ -67,13 +77,12 @@ class GridAgent:
             self.exploredCells[pos[1]][pos[0]] += 1
             self.currentPos = pos
     
-    def getUnexploredNeighbours(self):
+    def getNeighbours(self):
         nbrs=[]
         for (i, f) in enumerate(self.checks):
             if f():
                 xy = self.gets[i]()
-                nbrs.append(self.gets[i]())
-                self.exploredCells[xy[1]][xy[0]] += 1
+                nbrs.append(xy)
         return nbrs
 
     def moreToExplore(self):
@@ -83,24 +92,61 @@ class GridAgent:
                     return True
         return False
     
+    def checkCurrentPosForReward(self):
+        if self.gridEnv.isPositive(self.currentPos) and (self.currentPos not in self.positive):
+            self.positive.append(self.currentPos)
+        if self.gridEnv.isNegative(self.currentPos) and self.currentPos not in self.negative:
+            self.negative.append(self.currentPos)
+    
+    def getLeastExplored(self, nbrs):
+        lidx = -1
+        lval = 100000
+        for (i, n) in enumerate(nbrs):
+            val = self.exploredCells[n[1]][n[0]]
+            if val < lval:
+                lval = val
+                lidx = i
+            #introduce some randomness
+            elif val==lval and randint(0,100)%2:
+                lval = val
+                lidx = i
+        return nbrs[lidx]
+    
     def explore(self):
+        self.moveTo(self.currentPos)
+        self.checkCurrentPosForReward()
         iterations = 0
+        
         while self.moreToExplore():
-            #self.printExplored()
-            neighbours = self.getUnexploredNeighbours()
+            neighbours = self.getNeighbours()
             if len(neighbours) == 0:
                 pass
             elif len(neighbours) == 1:
                 self.moveTo(neighbours[0])
+                self.checkCurrentPosForReward()
             else:
-                self.moveTo(neighbours[randint(0, len(neighbours) - 1)])
-            if self.gridEnv.isPositive(self.currentPos) and (self.currentPos not in self.positive):
-                self.positive.append(self.currentPos)
-            if self.gridEnv.isNegative(self.currentPos) and self.currentPos not in self.negative:
-                self.negative.append(self.currentPos)
+                self.moveTo(self.getLeastExplored(neighbours))
+                self.checkCurrentPosForReward()
             iterations += 1
         self.printExplored()
         print("%d iterations to fully explore grid." % iterations)
+    
+    def calculateBellmanHelper(self, prev, nbrs):
+        for n in nbrs:
+            if prev in self.positive:
+                self.gridEnv.setValue(1, n)
+            else:
+                self.gridEnv.setValue(self.discount*self.gridEnv.getValue(prev), n)
+            self.exploredCells[n[1]][n[0]] += 1
+            if self.gridEnv.getValue(n)==0:
+                self.moveTo(n)
+                yield self.getNeighbours()
+    
+    def calculateBellman(self):
+        for p in self.positive:
+            self.initExploredCells(True)
+            self.moveTo(p)
+            self.calculateBellmanHelper(p,self.getNeighbours())
         
     def printExplored(self):
         for y in range(self.gridEnv.rows):

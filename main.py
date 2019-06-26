@@ -19,3 +19,6 @@ agent = GridAgent(ge,(0, 0))
 
 ge.print()
 agent.explore()
+agent.calculateBellman()
+
+ge.print()

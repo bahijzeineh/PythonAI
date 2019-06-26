@@ -6,6 +6,10 @@ Created on Wed Jun 26 14:03:29 2019
 """
 
 class GridEnvironment:
+    IMPASSABLE = "#"
+    POSITIVE = "+"
+    NEGATIVE = "-"
+    
     def __init__(self, columns, rows):
         self.rows = rows
         self.columns = columns
@@ -17,26 +21,26 @@ class GridEnvironment:
     def setImpassable(self, xy):
         if xy not in self.impassable:
             self.impassable.append(xy)
-        self.grid[xy[1]][xy[0]] = "#"
+        self.grid[xy[1]][xy[0]] = GridEnvironment.IMPASSABLE
     def isImpassable(self, xy):
-        return self.grid[xy[1]][xy[0]] == "#"
+        return self.grid[xy[1]][xy[0]] == GridEnvironment.IMPASSABLE
     
     def setPositive(self, xy):
         if xy not in self.positive:
             self.positive.append(xy)
-        self.grid[xy[1]][xy[0]] = "+"
+        self.grid[xy[1]][xy[0]] = GridEnvironment.POSITIVE
     def isPositive(self, xy):
-        return self.grid[xy[1]][xy[0]] == "+"
+        return self.grid[xy[1]][xy[0]] == GridEnvironment.POSITIVE
     
     def setNegative(self, xy):
         if xy not in self.negative:
             self.negative.append(xy)
-        self.grid[xy[1]][xy[0]] = "-"
+        self.grid[xy[1]][xy[0]] = GridEnvironment.NEGATIVE
     def isNegative(self, xy):
-        return self.grid[xy[1]][xy[0]] == "-"
+        return self.grid[xy[1]][xy[0]] == GridEnvironment.NEGATIVE
     
     def setValue(self, value, xy):
-        if self.grid[xy[1]][xy[0]] > value:
+        if (self.grid[xy[1]][xy[0]] == 0) or (self.grid[xy[1]][xy[0]] < value):
             self.grid[xy[1]][xy[0]] = value
     def getValue(self, xy):
         return self.grid[xy[1]][xy[0]]
