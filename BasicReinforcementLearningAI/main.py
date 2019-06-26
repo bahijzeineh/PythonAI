@@ -26,5 +26,5 @@ ge.print()
 
 agent.traverse((2, 2))
 agent.traverse((4, 5))
-agent.traverse((4, 6))
-agent.traverse((4, 4))
+agent.traverse((4, 6), False)
+agent.traverse((4, 4), False)

@@ -6,6 +6,8 @@ Created on Wed Jun 26 14:22:46 2019
 """
 
 from random import randint
+from GridEnvironment import GridEnvironment
+
 
 class GridAgent:
     def __init__(self, gridEnv, start):
@@ -85,7 +87,100 @@ class GridAgent:
                 nbrs.append(xy)
         return nbrs
 
+    def calculateBellman(self, changeValues=True):
+        curr = self.currentPos
+        possible = []
+        for (i, ch) in enumerate(self.checks):
+            if ch():
+                possible.append(i)
+        decision = possible[randint(0, len(possible) - 1)]
+        possible = possible[0:decision] + possible[decision:]
+        dpos = self.gets[decision]()
+        dalts = []
+        for i in possible:
+            dalts.append(self.gets[i]())
+        primaryProb = 99
+        secondaryProb = float(100 - primaryProb) / len(dalts)
+        chance = randint(0, 1000) % 100
+        target = 0
+        
+        if chance >= 100 - primaryProb:
+            target = dpos
+        else:
+            for i in range(len(dalts)):
+                if chance >= i * secondaryProb and chance < secondaryProb * (i + 1):
+                    target = dalts[i]
+                    break
+                
+        if changeValues:
+            val = 0
+            if target in self.gridEnv.positive:
+                val = 1 * primaryProb/100
+            elif target in self.gridEnv.negative:
+                pass
+            else:
+                val = self.gridEnv.getValue(target) * primaryProb/100
+            for xy in dalts:
+                if xy not in self.gridEnv.positive and xy not in self.gridEnv.negative:
+                    val += self.gridEnv.getValue(xy) * secondaryProb/100
+            self.gridEnv.setValue(self.discount * val, curr)
+        return target
+    
+    
+    def mapBellman(self, iterations = 1500):
+        self.currentPos = self.startPos
+        
+        for i in range(iterations):
+            pos = self.calculateBellman()
+            if pos != 0:
+                self.moveTo(pos)
+            
+    def traverse(self, startPos, deterministic = True, steps = 0):
+        self.moveTo(startPos)
+        nxt = 0
+        if startPos in self.gridEnv.positive:
+            print("arrived in %d steps." % steps)
+        #elif startPos in self.gridEnv.negative:
+         #   pass
+        else:
+            if deterministic:
+                ll=[]
+                lval = 0
+                for n in self.getNeighbours():
+                    val = self.gridEnv.getValue(n)
+                    if val == GridEnvironment.POSITIVE:
+                        lval = val
+                        break
+                    elif val > lval:
+                        lval = val
+                for n in self.getNeighbours():
+                    if self.gridEnv.getValue(n) == lval:
+                        ll.append(n)
+
+                if len(ll) == 1:
+                    nxt = ll[0]
+                else:
+                    nxt = ll[randint(0, len(ll) - 1)]
+                self.traverse(nxt, deterministic, steps + 1)
+            else:
+                nxt = self.calculateBellman(False)
+                self.traverse(nxt, deterministic, steps + 1)
+
     '''
+    def printExplored(self):
+        for y in range(self.gridEnv.rows):
+            for x in range(self.gridEnv.columns):
+                out = 0
+                if (x,y) == self.currentPos:
+                    out = "@"
+                else:
+                    out = self.exploredCells[y][x]
+                print(out, end = " ")
+            print()
+        print()
+        print("positives: ", self.positive)
+        print("negatives: ", self.negative)
+    
     def moreToExplore(self):
         for row in self.exploredCells:
             for col in row:
@@ -150,85 +245,5 @@ class GridAgent:
             self.makeMove()
             self.calculateBellman(prev, self.currentPos)
     '''
-    
-    def calculateBellman(self):
-        curr = self.currentPos
-        possible = []
-        for (i, ch) in enumerate(self.checks):
-            if ch():
-                possible.append(i)
-        decision = possible[randint(0, len(possible) - 1)]
-        possible = possible[0:decision] + possible[decision:]
-        dpos = self.gets[decision]()
-        dalts = []
-        for i in possible:
-            dalts.append(self.gets[i]())
-        primaryProb = 70
-        secondaryProb = float(30) / len(dalts)
-        chance = randint(0, 1000) % 100
-        target = 0
-        for i in range(len(dalts)):
-            if chance >= i * secondaryProb and chance <= secondaryProb * (i + 1):
-                target = dalts[i]
-                break
-            elif chance >= 100 - primaryProb:
-                target = dpos
-                break
-        if target in self.gridEnv.positive:
-            self.gridEnv.setValue(1.0, curr)
-        elif target in self.gridEnv.negative:
-            pass
-        else:
-            val = self.gridEnv.getValue(target) * primaryProb/100
-            for xy in dalts:
-                if xy not in self.gridEnv.positive and xy not in self.gridEnv.negative:
-                    val += self.gridEnv.getValue(xy) * secondaryProb/100
-            self.gridEnv.setValue(self.discount * val, curr)
-        return target
-    
-    
-    def mapBellman(self, iterations = 1500):
-        self.currentPos = self.startPos
-        
-        for i in range(iterations):
-            pos = self.calculateBellman()
-            if pos != 0:
-                self.moveTo(pos)
-            
-    def traverse(self, startPos, steps = 0):
-        self.moveTo(startPos)
-        if self.gridEnv.getValue(startPos) == 1:
-            print("arrived in %d steps." % (steps + 1))
-        else:
-            ll=[]
-            lval = 0
-            for n in self.getNeighbours():
-                val = self.gridEnv.getValue(n)
-                if val > lval:
-                    lval = val
-            for n in self.getNeighbours():
-                if self.gridEnv.getValue(n) == lval:
-                    ll.append(n)
-            nxt = 0
-            if len(ll) == 1:
-                nxt = ll[0]
-            else:
-                nxt = ll[randint(0, len(ll) - 1)]
-            self.traverse(nxt, steps + 1)
-
-    def printExplored(self):
-        for y in range(self.gridEnv.rows):
-            for x in range(self.gridEnv.columns):
-                out = 0
-                if (x,y) == self.currentPos:
-                    out = "@"
-                else:
-                    out = self.exploredCells[y][x]
-                print(out, end = " ")
-            print()
-        print()
-        print("positives: ", self.positive)
-        print("negatives: ", self.negative)
-        
                 
             
