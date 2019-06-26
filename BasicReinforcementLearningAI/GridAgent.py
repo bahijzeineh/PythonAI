@@ -144,14 +144,17 @@ class GridAgent:
         self.currentPos = self.startPos
         
         for i in range(iterations):
-            possible = []
-            for (i, ch) in enumerate(self.checks):
-                if ch():
-                    possible.append(i)
-            decision = possible[randint(0, len(possible) - 1)]
             prev = self.currentPos
-            self.currentPos = self.gets[decision]()
+            self.makeMove()
             self.calculateBellman(prev, self.currentPos)
+    
+    def makeMove(self):
+        possible = []
+        for (i, ch) in enumerate(self.checks):
+            if ch():
+                possible.append(i)
+        decision = possible[randint(0, len(possible) - 1)]
+        self.currentPos = self.gets[decision]()
     
     def traverse(self, startPos, steps = 0):
         self.moveTo(startPos)

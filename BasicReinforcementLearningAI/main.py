@@ -19,10 +19,12 @@ ge.setNegative((0, 6))
 agent = GridAgent(ge,(0, 0))
 
 ge.print()
-agent.explore()
+#agent.explore()
 agent.mapBellman()
 
 ge.print()
 
-agent.traverse((2,2))
-agent.traverse((4,5))
+agent.traverse((2, 2))
+agent.traverse((4, 5))
+agent.traverse((4, 6))
+agent.traverse((4, 4))
