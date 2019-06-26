@@ -40,10 +40,18 @@ class GridEnvironment:
         return self.grid[xy[1]][xy[0]] == GridEnvironment.NEGATIVE
     
     def setValue(self, value, xy):
-        if (self.grid[xy[1]][xy[0]] == 0) or (self.grid[xy[1]][xy[0]] < value):
+        if not self.isImpassable(xy) and not self.isNegative(xy) and not self.isPositive(xy) \
+            and ((self.grid[xy[1]][xy[0]] == 0) or (self.grid[xy[1]][xy[0]] < value)):
             self.grid[xy[1]][xy[0]] = value
     def getValue(self, xy):
         return self.grid[xy[1]][xy[0]]
+    
+    def moreToMap(self):
+        for row in self.grid:
+            for col in row:
+                if col == 0:
+                    return True
+        return False
     
     def print(self):
         for i in range(self.rows):

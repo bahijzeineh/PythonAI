@@ -131,23 +131,49 @@ class GridAgent:
         self.printExplored()
         print("%d iterations to fully explore grid." % iterations)
     
-    def calculateBellmanHelper(self, prev, nbrs):
-        for n in nbrs:
-            if prev in self.positive:
-                self.gridEnv.setValue(1, n)
+    def calculateBellman(self, prev, curr):
+            if curr in self.gridEnv.positive:
+                self.gridEnv.setValue(1.0, prev)
+            elif curr in self.gridEnv.negative:
+                pass
             else:
-                self.gridEnv.setValue(self.discount*self.gridEnv.getValue(prev), n)
-            self.exploredCells[n[1]][n[0]] += 1
-            if self.gridEnv.getValue(n)==0:
-                self.moveTo(n)
-                yield self.getNeighbours()
+                self.gridEnv.setValue(self.discount * self.gridEnv.getValue(curr), prev)
     
-    def calculateBellman(self):
-        for p in self.positive:
-            self.initExploredCells(True)
-            self.moveTo(p)
-            self.calculateBellmanHelper(p,self.getNeighbours())
+    def mapBellman(self, iterations = 1500):
+        self.initExploredCells()
+        self.currentPos = self.startPos
         
+        for i in range(iterations):
+            possible = []
+            for (i, ch) in enumerate(self.checks):
+                if ch():
+                    possible.append(i)
+            decision = possible[randint(0, len(possible) - 1)]
+            prev = self.currentPos
+            self.currentPos = self.gets[decision]()
+            self.calculateBellman(prev, self.currentPos)
+    
+    def traverse(self, startPos, steps = 0):
+        self.moveTo(startPos)
+        if self.gridEnv.getValue(startPos) == 1:
+            print("arrived in %d steps." % (steps + 1))
+        else:
+            ll=[]
+            lval = 0
+            for n in self.getNeighbours():
+                val = self.gridEnv.getValue(n)
+                if val > lval:
+                    lval = val
+            for n in self.getNeighbours():
+                if self.gridEnv.getValue(n) == lval:
+                    ll.append(n)
+            nxt = 0
+            if len(ll) == 1:
+                nxt = ll[0]
+            else:
+                nxt = ll[randint(0, len(ll) - 1)]
+            self.traverse(nxt, steps + 1)
+
     def printExplored(self):
         for y in range(self.gridEnv.rows):
             for x in range(self.gridEnv.columns):
@@ -156,7 +182,7 @@ class GridAgent:
                     out = "@"
                 else:
                     out = self.exploredCells[y][x]
-                print(out,end = " ")
+                print(out, end = " ")
             print()
         print()
         print("positives: ", self.positive)

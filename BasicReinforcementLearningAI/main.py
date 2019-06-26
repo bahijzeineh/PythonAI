@@ -11,6 +11,7 @@ from GridAgent import GridAgent
 
 ge = GridEnvironment(5, 9)
 ge.setPositive((4, 8))
+ge.setPositive((0,2))
 ge.setImpassable((0, 1))
 ge.setImpassable((3, 2))
 ge.setNegative((0, 6))
@@ -19,6 +20,9 @@ agent = GridAgent(ge,(0, 0))
 
 ge.print()
 agent.explore()
-agent.calculateBellman()
+agent.mapBellman()
 
 ge.print()
+
+agent.traverse((2,2))
+agent.traverse((4,5))
