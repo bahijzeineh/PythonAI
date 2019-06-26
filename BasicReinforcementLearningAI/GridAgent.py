@@ -85,6 +85,7 @@ class GridAgent:
                 nbrs.append(xy)
         return nbrs
 
+    '''
     def moreToExplore(self):
         for row in self.exploredCells:
             for col in row:
@@ -130,7 +131,7 @@ class GridAgent:
             iterations += 1
         self.printExplored()
         print("%d iterations to fully explore grid." % iterations)
-    
+    '''
     def calculateBellman(self, prev, curr):
             if curr in self.gridEnv.positive:
                 self.gridEnv.setValue(1.0, prev)

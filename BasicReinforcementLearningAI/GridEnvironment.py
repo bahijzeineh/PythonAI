@@ -45,14 +45,7 @@ class GridEnvironment:
             self.grid[xy[1]][xy[0]] = value
     def getValue(self, xy):
         return self.grid[xy[1]][xy[0]]
-    
-    def moreToMap(self):
-        for row in self.grid:
-            for col in row:
-                if col == 0:
-                    return True
-        return False
-    
+
     def print(self):
         for i in range(self.rows):
             print(self.grid[i])
