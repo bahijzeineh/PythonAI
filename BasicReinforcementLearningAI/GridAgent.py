@@ -179,12 +179,15 @@ class GridAgent:
         elif target in self.gridEnv.negative:
             pass
         else:
-            self.gridEnv.setValue(self.discount * self.gridEnv.getValue(target), curr)
+            val = self.gridEnv.getValue(target) * primaryProb/100
+            for xy in dalts:
+                if xy not in self.gridEnv.positive and xy not in self.gridEnv.negative:
+                    val += self.gridEnv.getValue(xy) * secondaryProb/100
+            self.gridEnv.setValue(self.discount * val, curr)
         return target
     
     
     def mapBellman(self, iterations = 1500):
-        self.initExploredCells()
         self.currentPos = self.startPos
         
         for i in range(iterations):
