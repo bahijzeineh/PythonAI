@@ -6,31 +6,40 @@ Created on Wed Jun 26 14:03:29 2019
 """
 
 class GridEnvironment:
-    def __init__(self, rows, columns):
+    def __init__(self, columns, rows):
         self.rows = rows
         self.columns = columns
         self.grid = [[0] * self.columns for i in range(self.rows)]
+        self.positive = []
+        self.negative = []
+        self.impassable = []
     
-    def setImpassable(self, row, column):
-        self.grid[row][column]="#"
-    def isImpassable(self, row, column):
-        return self.grid[row][column]=="#"
+    def setImpassable(self, xy):
+        if xy not in self.impassable:
+            self.impassable.append(xy)
+        self.grid[xy[1]][xy[0]] = "#"
+    def isImpassable(self, xy):
+        return self.grid[xy[1]][xy[0]] == "#"
     
-    def setPositive(self, row, column):
-        self.grid[row][column]="+"
-    def isPositive(self, row, column):
-        return self.grid[row][column]=="+"
+    def setPositive(self, xy):
+        if xy not in self.positive:
+            self.positive.append(xy)
+        self.grid[xy[1]][xy[0]] = "+"
+    def isPositive(self, xy):
+        return self.grid[xy[1]][xy[0]] == "+"
     
-    def setNegative(self, row, column):
-        self.grid[row][column]="-"
-    def isNegative(self, row, column):
-        return self.grid[row][column]=="-"
+    def setNegative(self, xy):
+        if xy not in self.negative:
+            self.negative.append(xy)
+        self.grid[xy[1]][xy[0]] = "-"
+    def isNegative(self, xy):
+        return self.grid[xy[1]][xy[0]] == "-"
     
-    def setValue(self, value, row, column):
-        if self.grid[row][column] > value:
-            self.grid[row][column] = value
-    def getValue(self, row, column):
-        return self.grid[row][column]
+    def setValue(self, value, xy):
+        if self.grid[xy[1]][xy[0]] > value:
+            self.grid[xy[1]][xy[0]] = value
+    def getValue(self, xy):
+        return self.grid[xy[1]][xy[0]]
     
     def print(self):
         for i in range(self.rows):
