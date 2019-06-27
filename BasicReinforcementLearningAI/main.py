@@ -15,16 +15,20 @@ ge.setPositive((0,2))
 ge.setImpassable((0, 1))
 ge.setImpassable((3, 2))
 ge.setNegative((0, 6))
+ge.setNegative((1, 8))
 
 agent = GridAgent(ge,(0, 0))
 
 ge.print()
-#agent.explore()
+
 agent.mapBellman()
 
 ge.print()
+print()
 
+print("deterministic:")
 agent.traverse((2, 2))
 agent.traverse((4, 5))
-agent.traverse((4, 6), False)
-agent.traverse((4, 4), False)
+print("non deterministic:")
+agent.traverse((4, 6), deterministic = False)
+agent.traverse((4, 4), deterministic = False)

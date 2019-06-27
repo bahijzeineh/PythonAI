@@ -87,7 +87,7 @@ class GridAgent:
                 nbrs.append(xy)
         return nbrs
 
-    def calculateBellman(self, changeValues=True):
+    def calculateBellman(self, changeValues = True):
         curr = self.currentPos
         possible = []
         for (i, ch) in enumerate(self.checks):
@@ -99,7 +99,7 @@ class GridAgent:
         dalts = []
         for i in possible:
             dalts.append(self.gets[i]())
-        primaryProb = 99
+        primaryProb = float(70)
         secondaryProb = float(100 - primaryProb) / len(dalts)
         chance = randint(0, 1000) % 100
         target = 0
@@ -117,12 +117,18 @@ class GridAgent:
             if target in self.gridEnv.positive:
                 val = 1 * primaryProb/100
             elif target in self.gridEnv.negative:
-                pass
+                val = -1 * primaryProb/100
+                #print("in negative: ",val)
+                #pass
             else:
                 val = self.gridEnv.getValue(target) * primaryProb/100
             for xy in dalts:
                 if xy not in self.gridEnv.positive and xy not in self.gridEnv.negative:
                     val += self.gridEnv.getValue(xy) * secondaryProb/100
+                elif xy in self.gridEnv.negative:
+                    val += -1 * secondaryProb/100
+                elif xy in self.gridEnv.positive:
+                    val += 1 * secondaryProb/100
             self.gridEnv.setValue(self.discount * val, curr)
         return target
     
@@ -165,85 +171,3 @@ class GridAgent:
             else:
                 nxt = self.calculateBellman(False)
                 self.traverse(nxt, deterministic, steps + 1)
-
-    '''
-    def printExplored(self):
-        for y in range(self.gridEnv.rows):
-            for x in range(self.gridEnv.columns):
-                out = 0
-                if (x,y) == self.currentPos:
-                    out = "@"
-                else:
-                    out = self.exploredCells[y][x]
-                print(out, end = " ")
-            print()
-        print()
-        print("positives: ", self.positive)
-        print("negatives: ", self.negative)
-    
-    def moreToExplore(self):
-        for row in self.exploredCells:
-            for col in row:
-                if col == 0:
-                    return True
-        return False
-    
-    def checkCurrentPosForReward(self):
-        if self.gridEnv.isPositive(self.currentPos) and (self.currentPos not in self.positive):
-            self.positive.append(self.currentPos)
-        if self.gridEnv.isNegative(self.currentPos) and self.currentPos not in self.negative:
-            self.negative.append(self.currentPos)
-    
-    def getLeastExplored(self, nbrs):
-        lidx = -1
-        lval = 100000
-        for (i, n) in enumerate(nbrs):
-            val = self.exploredCells[n[1]][n[0]]
-            if val < lval:
-                lval = val
-                lidx = i
-            #introduce some randomness
-            elif val==lval and randint(0,100)%2:
-                lval = val
-                lidx = i
-        return nbrs[lidx]
-    
-    def explore(self):
-        self.moveTo(self.currentPos)
-        self.checkCurrentPosForReward()
-        iterations = 0
-        
-        while self.moreToExplore():
-            neighbours = self.getNeighbours()
-            if len(neighbours) == 0:
-                pass
-            elif len(neighbours) == 1:
-                self.moveTo(neighbours[0])
-                self.checkCurrentPosForReward()
-            else:
-                self.moveTo(self.getLeastExplored(neighbours))
-                self.checkCurrentPosForReward()
-            iterations += 1
-        self.printExplored()
-        print("%d iterations to fully explore grid." % iterations)
-    
-    def calculateBellman(self, prev, curr):
-        if curr in self.gridEnv.positive:
-            self.gridEnv.setValue(1.0, prev)
-        elif curr in self.gridEnv.negative:
-            pass
-        else:
-            self.gridEnv.setValue(self.discount * self.gridEnv.getValue(curr), prev)
-    
-    
-    def mapBellman(self, iterations = 1500):
-        self.initExploredCells()
-        self.currentPos = self.startPos
-        
-        for i in range(iterations):
-            prev = self.currentPos
-            self.makeMove()
-            self.calculateBellman(prev, self.currentPos)
-    '''
-                
-            
