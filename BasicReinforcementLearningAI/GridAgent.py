@@ -14,26 +14,11 @@ class GridAgent:
         self.gridEnv = gridEnv
         self.startPos = start
         self.currentPos = start
-        self.positive = []
-        self.negative = []
         self.discount = .9
     
-        self.initExploredCells()
-        
         self.checks = [self.canMoveUp, self.canMoveDown, self.canMoveLeft, self.canMoveRight]
         self.gets = [self.getUp, self.getDown, self.getLeft, self.getRight]
         self.actions = [self.moveUp, self.moveDown, self.moveLeft, self.moveRight]
-    
-    def initExploredCells(self, addRewards = False):
-        self.exploredCells = [[0] * self.gridEnv.columns for i in range(self.gridEnv.rows)]
-        for (x,y) in self.gridEnv.impassable:
-            self.exploredCells[y][x] = 1
-        if addRewards:
-            for (x,y) in self.positive:
-                self.exploredCells[y][x] = 1
-            for (x,y) in self.negative:
-                self.exploredCells[y][x] = 1
-            
     
     def canMoveUp(self):
         return self.currentPos[1] > 0 and not self.gridEnv.isImpassable(self.getUp())
@@ -56,27 +41,22 @@ class GridAgent:
     def moveUp(self):
         if self.canMoveUp():
             pos = self.getUp()
-            self.exploredCells[pos[1]][pos[0]] += 1
             self.currentPos = pos
     def moveDown(self):
         if self.canMoveDown():
             pos = self.getDown()
-            self.exploredCells[pos[1]][pos[0]] += 1
             self.currentPos = pos
     def moveLeft(self):
         if self.canMoveLeft():
             pos = self.getLeft()
-            self.exploredCells[pos[1]][pos[0]] += 1
             self.currentPos = pos
     def moveRight(self):
         if self.canMoveRight():
             pos = self.getRight()
-            self.exploredCells[pos[1]][pos[0]] += 1
             self.currentPos = pos
             
     def moveTo(self, pos):
         if not self.gridEnv.isImpassable(pos):
-            self.exploredCells[pos[1]][pos[0]] += 1
             self.currentPos = pos
     
     def getNeighbours(self):
@@ -101,7 +81,7 @@ class GridAgent:
             dalts.append(self.gets[i]())
         primaryProb = float(70)
         secondaryProb = float(100 - primaryProb) / len(dalts)
-        chance = randint(0, 1000) % 100
+        chance = randint(0, 1000000) % 100
         target = 0
         
         if chance >= 100 - primaryProb:
