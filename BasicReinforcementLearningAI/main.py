@@ -10,7 +10,7 @@ from GridAgent import GridAgent
 from random import randint
 
 
-def createRandomGrid(maxC = 35, maxR = 35):
+def createRandomGrid(maxC = 15, maxR = 15):
     ge = GridEnvironment(randint(10, maxC), randint(10, maxR))
     numWalls = randint(0, int(ge.rows / ge.columns))
     numPos = randint(1, int(ge.rows/2))

@@ -73,17 +73,23 @@ class GridAgent:
         for (i, ch) in enumerate(self.checks):
             if ch():
                 possible.append(i)
-        decision = possible[randint(0, len(possible) - 1)]
-        possible = possible[0:decision] + possible[decision:]
-        dpos = self.gets[decision]()
+        dpos = self.getDeterministicMove()
+        
+        decision = 0
+        for (i, get) in enumerate(self.gets):
+            if dpos == get():
+                decision = i
+                break
+        possible = possible[:decision] + possible[decision:]
+        
         dalts = []
         for i in possible:
             dalts.append(self.gets[i]())
         primaryProb = float(70)
         secondaryProb = float(100 - primaryProb) / len(dalts)
         chance = randint(0, 1000000) % 100
-        target = 0
         
+        target = 0
         if chance >= 100 - primaryProb:
             target = dpos
         else:
@@ -98,8 +104,6 @@ class GridAgent:
                 val = 1 * primaryProb/100
             elif target in self.gridEnv.negative:
                 val = -1 * primaryProb/100
-                #print("in negative: ",val)
-                #pass
             else:
                 val = self.gridEnv.getValue(target) * primaryProb/100
             for xy in dalts:
@@ -120,7 +124,33 @@ class GridAgent:
             pos = self.calculateBellman()
             if pos != 0:
                 self.moveTo(pos)
-            
+    
+    def getDeterministicMove(self):
+        ll=[]
+        lval = 0
+        for n in self.getNeighbours():
+            val = self.gridEnv.getValue(n)
+            if val == GridEnvironment.POSITIVE:
+                lval = val
+                break
+            elif val == GridEnvironment.NEGATIVE:
+                pass
+            elif val > lval:
+                lval = val
+        for n in self.getNeighbours():
+            if self.gridEnv.getValue(n) == lval:
+                ll.append(n)
+
+        nxt = 0
+        if len(ll) == 1:
+            nxt = ll[0]
+        elif len(ll) == 0:
+            ''' may cause recursive fail'''
+            nxt = self.currentPos
+        else:
+            nxt = ll[randint(0, len(ll) - 1)]
+        return nxt
+    
     def traverse(self, startPos, deterministic = True, steps = 0):
         self.moveTo(startPos)
         nxt = 0
@@ -130,25 +160,7 @@ class GridAgent:
          #   pass
         else:
             if deterministic:
-                ll=[]
-                lval = 0
-                for n in self.getNeighbours():
-                    val = self.gridEnv.getValue(n)
-                    if val == GridEnvironment.POSITIVE:
-                        lval = val
-                        break
-                    elif val == GridEnvironment.NEGATIVE:
-                        pass
-                    elif val > lval:
-                        lval = val
-                for n in self.getNeighbours():
-                    if self.gridEnv.getValue(n) == lval:
-                        ll.append(n)
-
-                if len(ll) == 1:
-                    nxt = ll[0]
-                else:
-                    nxt = ll[randint(0, len(ll) - 1)]
+                nxt = self.getDeterministicMove()
                 self.traverse(nxt, deterministic, steps + 1)
             else:
                 nxt = self.calculateBellman(False)
