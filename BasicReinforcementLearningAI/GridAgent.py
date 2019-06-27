@@ -75,12 +75,13 @@ class GridAgent:
                 possible.append(i)
         dpos = self.getDeterministicMove()
         
-        decision = 0
-        for (i, get) in enumerate(self.gets):
-            if dpos == get():
-                decision = i
-                break
-        possible = possible[:decision] + possible[decision:]
+        if dpos != None:
+            decision = -1
+            for (i, get) in enumerate(self.gets):
+                if dpos == get():
+                    decision = i
+                    break
+            possible = possible[:decision] + possible[decision:]
         
         dalts = []
         for i in possible:
@@ -91,8 +92,12 @@ class GridAgent:
         
         target = 0
         if chance >= 100 - primaryProb:
-            target = dpos
-        else:
+            if dpos != None:
+                target = dpos
+            else:
+                primaryProb = 0
+                secondaryProb = float(100) / len(dalts)
+        if target == 0:
             for i in range(len(dalts)):
                 if chance >= i * secondaryProb and chance < secondaryProb * (i + 1):
                     target = dalts[i]
@@ -147,7 +152,7 @@ class GridAgent:
             nxt = ll[0]
         elif len(ll) == 0:
             ''' may cause recursive fail'''
-            nxt = self.currentPos
+            nxt = None#self.currentPos
         else:
             nxt = ll[randint(0, len(ll) - 1)]
         return nxt
