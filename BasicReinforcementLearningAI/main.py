@@ -10,10 +10,10 @@ from GridAgent import GridAgent
 from random import randint
 
 
-def createRandomGrid(maxC = 15, maxR = 15):
-    ge = GridEnvironment(randint(10, maxC), randint(10, maxR))
+def createRandomGrid(maxC = 5, maxR = 10):
+    ge = GridEnvironment(randint(5, maxC), randint(5, maxR))
     numWalls = randint(0, int(ge.rows / ge.columns))
-    numPos = randint(1, int(ge.rows/2))
+    numPos = randint(1, int(ge.rows/3))
     numNeg = int(numPos/2 + 1)
     for i in range(numWalls):
         xy = (randint(0, ge.columns - 1), randint(0, ge.rows - 1))
@@ -29,6 +29,7 @@ def createRandomGrid(maxC = 15, maxR = 15):
 def mapGrid(ge, startPos):
     agent = GridAgent(ge, startPos)
     agent.mapBellman(iterations = ge.rows*ge.columns*500)
+    agent.gridEnv.print()
     return agent
 
 def traverseGrid(agent, startPos):
@@ -37,7 +38,7 @@ def traverseGrid(agent, startPos):
     agent.traverse(startPos, deterministic)
 
 def multiTraverse(agent, count = 5):
-    print("grid of dimensions: %d, %d" %(agent.gridEnv.columns, agent.gridEnv.rows))
+    print("grid of dimensions: %d, %d" % (agent.gridEnv.rows, agent.gridEnv.columns))
     for i in range(count):
         startPos = (randint(0, agent.gridEnv.columns - 1), randint(0, agent.gridEnv.rows - 1))
         traverseGrid(agent, startPos)

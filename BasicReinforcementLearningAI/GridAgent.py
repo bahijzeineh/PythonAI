@@ -67,7 +67,7 @@ class GridAgent:
                 nbrs.append(xy)
         return nbrs
 
-    def calculateBellman(self, changeValues = True):
+    def calculateBellman(self, changeValues = True, primaryProb = float(40)):
         curr = self.currentPos
         possible = []
         for (i, ch) in enumerate(self.checks):
@@ -85,7 +85,7 @@ class GridAgent:
         dalts = []
         for i in possible:
             dalts.append(self.gets[i]())
-        primaryProb = float(70)
+        primaryProb = float(40)
         secondaryProb = float(100 - primaryProb) / len(dalts)
         chance = randint(0, 1000000) % 100
         
@@ -106,14 +106,15 @@ class GridAgent:
                 val = -1 * primaryProb/100
             else:
                 val = self.gridEnv.getValue(target) * primaryProb/100
+            val2 = 0
             for xy in dalts:
                 if xy not in self.gridEnv.positive and xy not in self.gridEnv.negative:
-                    val += self.gridEnv.getValue(xy) * secondaryProb/100
+                    val2 += self.gridEnv.getValue(xy) * secondaryProb/100
                 elif xy in self.gridEnv.negative:
-                    val += -1 * secondaryProb/100
+                    val2 += -1 * secondaryProb/100
                 elif xy in self.gridEnv.positive:
-                    val += 1 * secondaryProb/100
-            self.gridEnv.setValue(self.discount * val, curr)
+                    val2 += 1 * secondaryProb/100
+            self.gridEnv.setValue(val + self.discount * val2, curr)
         return target
     
     
@@ -163,5 +164,5 @@ class GridAgent:
                 nxt = self.getDeterministicMove()
                 self.traverse(nxt, deterministic, steps + 1)
             else:
-                nxt = self.calculateBellman(False)
+                nxt = self.calculateBellman(False, 80)
                 self.traverse(nxt, deterministic, steps + 1)
