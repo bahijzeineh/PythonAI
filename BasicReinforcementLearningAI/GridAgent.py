@@ -137,6 +137,8 @@ class GridAgent:
                     if val == GridEnvironment.POSITIVE:
                         lval = val
                         break
+                    elif val == GridEnvironment.NEGATIVE:
+                        pass
                     elif val > lval:
                         lval = val
                 for n in self.getNeighbours():

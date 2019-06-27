@@ -7,28 +7,47 @@ Created on Wed Jun 26 16:28:03 2019
 
 from GridEnvironment import GridEnvironment
 from GridAgent import GridAgent
+from random import randint
 
 
-ge = GridEnvironment(5, 9)
-ge.setPositive((4, 8))
-ge.setPositive((0,2))
-ge.setImpassable((0, 1))
-ge.setImpassable((3, 2))
-ge.setNegative((0, 6))
-ge.setNegative((1, 8))
+def createRandomGrid(maxC = 35, maxR = 35):
+    ge = GridEnvironment(randint(10, maxC), randint(10, maxR))
+    numWalls = randint(0, int(ge.rows / ge.columns))
+    numPos = randint(1, int(ge.rows/2))
+    numNeg = int(numPos/2 + 1)
+    for i in range(numWalls):
+        xy = (randint(0, ge.columns - 1), randint(0, ge.rows - 1))
+        ge.setImpassable(xy)
+    for i in range(numNeg):
+        xy = (randint(0, ge.columns - 1), randint(0, ge.rows - 1))
+        ge.setNegative(xy)
+    for i in range(numPos):
+        xy = (randint(0, ge.columns - 1), randint(0, ge.rows - 1))
+        ge.setPositive(xy)
+    return ge
 
-agent = GridAgent(ge,(0, 0))
+def mapGrid(ge, startPos):
+    agent = GridAgent(ge, startPos)
+    agent.mapBellman(iterations = ge.rows*ge.columns*500)
+    return agent
 
-ge.print()
+def traverseGrid(agent, startPos):
+    deterministic = randint(0, 100) % 2 == 0
+    print("deterministic: ", deterministic)
+    agent.traverse(startPos, deterministic)
 
-agent.mapBellman()
+def multiTraverse(agent, count = 5):
+    print("grid of dimensions: %d, %d" %(agent.gridEnv.columns, agent.gridEnv.rows))
+    for i in range(count):
+        startPos = (randint(0, agent.gridEnv.columns - 1), randint(0, agent.gridEnv.rows - 1))
+        traverseGrid(agent, startPos)
 
-ge.print()
-print()
-
-print("deterministic:")
-agent.traverse((2, 2))
-agent.traverse((4, 5))
-print("non deterministic:")
-agent.traverse((4, 6), deterministic = False)
-agent.traverse((4, 4), deterministic = False)
+def run(numGrids = 5):
+    for i in range(numGrids):
+        ge = createRandomGrid()
+        agent = mapGrid(ge, (0, 0))
+        print()
+        multiTraverse(agent)
+        
+run()
+    
