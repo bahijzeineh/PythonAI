@@ -167,7 +167,10 @@ class GridAgent:
         else:
             if deterministic:
                 nxt = self.getDeterministicMove()
-                self.traverse(nxt, deterministic, steps + 1)
+                if nxt == None:
+                    print("Stuck at ", self.currentPos)
+                else:
+                    self.traverse(nxt, deterministic, steps + 1)
             else:
                 nxt = self.calculateBellman(False, 80)
                 self.traverse(nxt, deterministic, steps + 1)
