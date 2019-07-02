@@ -51,7 +51,7 @@ model.add(Dense(activation = 'sigmoid', units = 1, kernel_initializer = 'uniform
 model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
 
 # fit ann to training set
-model.fit(X_train, y_train, batch_size = 20, epochs = 80)
+model.fit(X_train, y_train, batch_size = 40, epochs = 80)
 
 #part 3
 # Predicting the Test set results
