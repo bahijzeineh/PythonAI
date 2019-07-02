@@ -41,11 +41,7 @@ model = Sequential()
 model.add(Dense(activation = 'relu', units = 6, kernel_initializer = 'uniform', input_dim = 10))
 
 # add second hidden layer
-model.add(Dense(activation = 'relu', units = 9, kernel_initializer = 'uniform'))
-
-#add third and fourth hidden layers
 model.add(Dense(activation = 'relu', units = 6, kernel_initializer = 'uniform'))
-model.add(Dense(activation = 'relu', units = 7, kernel_initializer = 'uniform'))
 
 #add output layer
 model.add(Dense(activation = 'sigmoid', units = 1, kernel_initializer = 'uniform'))
