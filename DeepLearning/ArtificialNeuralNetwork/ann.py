@@ -34,15 +34,16 @@ X_test = sc.transform(X_test)
 
 from keras.models import Sequential
 from keras.layers import Dense
+from keras.layers import Dropout
 
 model = Sequential()
 
-#add input and first hidden layer
+#add input and first hidden layer with dropout
 model.add(Dense(activation = 'relu', units = 6, kernel_initializer = 'uniform', input_dim = 10))
-
+model.add(Dropout(rate = 0.1))
 # add second hidden layer
 model.add(Dense(activation = 'relu', units = 6, kernel_initializer = 'uniform'))
-
+model.add(Dropout(rate = 0.1))
 #add output layer
 model.add(Dense(activation = 'sigmoid', units = 1, kernel_initializer = 'uniform'))
 
