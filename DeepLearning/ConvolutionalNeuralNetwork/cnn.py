@@ -55,7 +55,7 @@ test_generator = test_datagen.flow_from_directory(
 model.fit_generator(
         train_generator,
         steps_per_epoch=8000,
-        epochs=5,
+        epochs=20,
         validation_data=test_generator,
         validation_steps=2000)
 
