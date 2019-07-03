@@ -17,35 +17,52 @@ from keras.layers import Convolution2D
 from keras.layers import MaxPooling2D
 from keras.layers import Flatten
 
+from keras.optimizers import Adam
+
 from keras.preprocessing.image import ImageDataGenerator
 
+imgd = 96
+
 class CNN:
-    def __init__(self):
+    def __init__(self, dropout = 0.2):
         self.model = Sequential()
         
         self.model.add(Convolution2D(
                 strides = 1, filters = 32, 
-                kernel_size = 3, 
-                input_shape = (64, 64, 3), 
+                kernel_size = 3,  padding = 'same',
+                input_shape = (imgd, imgd, 3), 
                 activation = 'relu'))
         self.model.add(MaxPooling2D(pool_size = 2))
-        self.model.add(Dropout(rate = 0.1))
         
         self.model.add(Convolution2D(
-                strides = 1, filters = 48, 
-                kernel_size = 3, 
+                strides = 1, filters = 32, 
+                kernel_size = 3, padding = 'same',
                 activation = 'relu'))
         self.model.add(MaxPooling2D(pool_size = 2))
-        self.model.add(Dropout(rate = 0.1))
         
+        self.model.add(Convolution2D(
+                strides = 1, filters = 64, 
+                kernel_size = 3,  padding = 'same',
+                activation = 'relu'))
+        self.model.add(MaxPooling2D(pool_size = 2))
+        
+        self.model.add(Convolution2D(
+                strides = 1, filters = 64, 
+                kernel_size = 3,  padding = 'same',
+                activation = 'relu'))
+        self.model.add(MaxPooling2D(pool_size = 2))
+
         self.model.add(Flatten())
         
-        self.model.add(Dense(units = 128, activation = 'relu'))
-        self.model.add(Dense(units = 128, activation = 'relu'))
-        self.model.add(Dropout(rate = 0.1))
+        self.model.add(Dense(units = 64, activation = 'relu'))
+        self.model.add(Dropout(rate = dropout))
+        self.model.add(Dense(units = 64, activation = 'relu'))
+        self.model.add(Dense(units = 64, activation = 'relu'))
+        self.model.add(Dropout(rate = dropout/2))
         self.model.add(Dense(units = 1, activation = 'sigmoid'))
         
-        self.model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+        optimizer = Adam(lr=1e-3)
+        self.model.compile(optimizer = optimizer, loss = 'binary_crossentropy', metrics = ['accuracy'])
 
     def fit_gen(self):
         train_datagen = ImageDataGenerator(
@@ -58,13 +75,13 @@ class CNN:
         
         train_generator = train_datagen.flow_from_directory(
                 'dataset/training_set',
-                target_size = (64, 64),
+                target_size = (imgd, imgd),
                 batch_size = 32,
                 class_mode = 'binary')
         
         test_generator = test_datagen.flow_from_directory(
                 'dataset/test_set',
-                target_size = (64, 64),
+                target_size = (imgd, imgd),
                 batch_size = 32,
                 class_mode = 'binary')
         
