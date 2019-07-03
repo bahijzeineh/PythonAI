@@ -7,6 +7,9 @@ Created on Wed Jul  3 07:28:01 2019
 
 # build CNN
 
+import numpy as np
+from keras.preprocessing import image
+
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Convolution2D
@@ -27,13 +30,19 @@ class CNN:
         
         self.model.add(MaxPooling2D(pool_size = 2))
         
+        self.model.add(Convolution2D(
+                strides = 1, filters = 48, 
+                kernel_size = 3, 
+                activation = 'relu'))
+        
+        self.model.add(MaxPooling2D(pool_size = 2))
+        
         self.model.add(Flatten())
         
         self.model.add(Dense(units = 128, activation = 'relu'))
         self.model.add(Dense(units = 1, activation = 'sigmoid'))
         
         self.model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
-
 
     def fit_gen(self):
         train_datagen = ImageDataGenerator(
@@ -62,3 +71,15 @@ class CNN:
                 epochs=3,
                 validation_data=test_generator,
                 validation_steps=2000)
+        return test_generator.class_indices
+        
+        def pred(self):
+            img1 = image.load_img('dataset/single_prediction/cat_or_dog_1.jpg', target_size=(64,64))
+            img1 = image.img_to_array(img1)
+            img2 = image.load_img('dataset/single_prediction/cat_or_dog_2.jpg', target_size=(64,64))
+            img2 = image.img_to_array(img2)
+            imgs=np.array([img1,img2])
+            
+            return self.model.predict(imgs)
+
+            
