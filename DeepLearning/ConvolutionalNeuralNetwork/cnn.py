@@ -88,16 +88,14 @@ class CNN:
         self.model.fit_generator(
                 train_generator,
                 steps_per_epoch = 8000,
-                epochs = 10,
+                epochs = 2,
                 validation_data = test_generator,
                 validation_steps = 2000)
         return test_generator.class_indices
         
-    def pred(self):
-        img1 = image.load_img('dataset/single_prediction/cat_or_dog_1.jpg', target_size = (64, 64))
+    def pred(self, imgloc):
+        img1 = image.load_img(imgloc, target_size = (imgd, imgd))
         img1 = image.img_to_array(img1)
-        img2 = image.load_img('dataset/single_prediction/cat_or_dog_2.jpg', target_size = (64, 64))
-        img2 = image.img_to_array(img2)
-        imgs = np.array([img1, img2])
+        imgs = np.array([img1])
         
         return self.model.predict(imgs)
