@@ -73,13 +73,13 @@ class CNN:
                 validation_steps=2000)
         return test_generator.class_indices
         
-        def pred(self):
-            img1 = image.load_img('dataset/single_prediction/cat_or_dog_1.jpg', target_size=(64,64))
-            img1 = image.img_to_array(img1)
-            img2 = image.load_img('dataset/single_prediction/cat_or_dog_2.jpg', target_size=(64,64))
-            img2 = image.img_to_array(img2)
-            imgs=np.array([img1,img2])
-            
-            return self.model.predict(imgs)
+    def pred(self):
+        img1 = image.load_img('dataset/single_prediction/cat_or_dog_1.jpg', target_size=(64,64))
+        img1 = image.img_to_array(img1)
+        img2 = image.load_img('dataset/single_prediction/cat_or_dog_2.jpg', target_size=(64,64))
+        img2 = image.img_to_array(img2)
+        imgs=np.array([img1,img2])
+        
+        return self.model.predict(imgs)
 
             
