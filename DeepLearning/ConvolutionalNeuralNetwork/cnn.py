@@ -24,7 +24,7 @@ from keras.preprocessing.image import ImageDataGenerator
 imgd = 96
 
 class CNN:
-    def __init__(self, dropout = 0.2):
+    def __init__(self, weightsFile = None, dropout = 0.2):
         self.model = Sequential()
         
         self.model.add(Convolution2D(
@@ -63,6 +63,9 @@ class CNN:
         
         optimizer = Adam(lr=1e-3)
         self.model.compile(optimizer = optimizer, loss = 'binary_crossentropy', metrics = ['accuracy'])
+        
+        if weightsFile is not None:
+            self.model.load_weights(weightsFile)
 
     def fit_gen(self):
         train_datagen = ImageDataGenerator(

@@ -53,7 +53,12 @@ model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accu
 # fit ann to training set
 model.fit(X_train, y_train, batch_size = 40, epochs = 80)
 
-y_pred = model.predict(X_test)
-accuracy = (y_pred == y_test)
-print('accuracy: ', (accuracy.sum()/64)/2000)
+scores = model.evaluate(X_test, y_test)
+print("accuracy: ", scores[1] * 100)
 
+def prediction(x,y,o,r):
+    test = np.array(genBinary(x) + [o] + genBinary(y)).reshape((1,17))
+    yt = genBinary(y, 64)
+    
+    res = model.predict(test)
+    print(res == yt)
