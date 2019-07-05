@@ -16,7 +16,7 @@ class ANN_ARITH:
             y = randint(0,15)
             opi = randint(0,1)
             res = opf[opi](x, y)
-            data.append(self.genBinary(x) + [opi] + self.genBinary(y) + self.genBinary(res))
+            data.append(self.genBinary(x,4) + [opi] + self.genBinary(y,4) + self.genBinary(res))
         return data
     def genBinary(self, x, digits = 8):
         binary = []
@@ -32,7 +32,7 @@ class ANN_ARITH:
     def __init__(self, file = None):
         self.model = Sequential()
     
-        self.model.add(Dense(activation = 'relu', units = 32, kernel_initializer = 'uniform', input_dim = 17))
+        self.model.add(Dense(activation = 'relu', units = 32, kernel_initializer = 'uniform', input_dim = 9))
         self.model.add(Dropout(rate=0.1))
         
         self.model.add(Dense(activation = 'relu', units = 32, kernel_initializer = 'uniform'))
@@ -54,8 +54,8 @@ class ANN_ARITH:
     def fit_gen(self, rows = 500000, batchSize = 8, epochs = 25):
         data = np.array(self.generateData(rows), dtype=np.int32)
         
-        X = data[:,0:17]
-        y = data[:,17:]
+        X = data[:,0:9]
+        y = data[:,9:]
         
         from sklearn.model_selection import train_test_split
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
@@ -67,13 +67,13 @@ class ANN_ARITH:
     def evaluate(self, testSize = 100000):
         data = np.array(self.generateData(testSize), dtype=np.int32)
         
-        X = data[:,0:17]
-        y = data[:,17:]
+        X = data[:,0:9]
+        y = data[:,9:]
         scores = self.model.evaluate(X, y)
         print("accuracy: ", scores[1] * 100)
     
     def prediction(self, x,y,o,r):
-        test = np.array(self.genBinary(x) + [o] + self.genBinary(y)).reshape((1,17))
+        test = np.array(self.genBinary(x,4) + [o] + self.genBinary(y,4)).reshape((1,9))
         yt = np.array(self.genBinary(r))
         
         res = self.model.predict(test)
