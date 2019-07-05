@@ -24,7 +24,7 @@ def genBinary(x, digits = 8):
     for i in range(digits):
         binary.append(0)
     return binary[::-1]
-data = np.array(generateData(250000), dtype=np.int32)
+data = np.array(generateData(500000), dtype=np.int32)
 
 X = data[:,0:17]
 y = data[:,17:]
@@ -44,13 +44,13 @@ model.add(Dense(activation = 'relu', units = 32, kernel_initializer = 'uniform',
 model.add(Dropout(rate=0.1))
 
 model.add(Dense(activation = 'relu', units = 32, kernel_initializer = 'uniform'))
-model.add(Dropout(rate=0.2))
+model.add(Dropout(rate=0.1))
 
 model.add(Dense(activation = 'relu', units = 32, kernel_initializer = 'uniform'))
-model.add(Dropout(rate=0.2))
+model.add(Dropout(rate=0.1))
 
 model.add(Dense(activation = 'relu', units = 32, kernel_initializer = 'uniform'))
-model.add(Dropout(rate=0.2))
+model.add(Dropout(rate=0.1))
 
 model.add(Dense(activation = 'sigmoid', units = 8, kernel_initializer = 'uniform'))
 
@@ -59,7 +59,7 @@ opt = Adam()
 model.compile(optimizer = opt, loss = 'binary_crossentropy', metrics = ['accuracy'])
 
 # fit ann to training set
-model.fit(X_train, y_train, batch_size = 8, epochs = 5)
+model.fit(X_train, y_train, batch_size = 8, epochs = 25)
 
 scores = model.evaluate(X_test, y_test)
 print("accuracy: ", scores[1] * 100)
@@ -69,7 +69,7 @@ def prediction(x,y,o,r):
     yt = np.array(genBinary(r))
     
     res = model.predict(test)
-    res = res > 0.7
+    res = res > 0.65
     
     success = True
     for i,col in enumerate(res[0]):
