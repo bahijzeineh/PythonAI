@@ -24,7 +24,7 @@ def genBinary(x, digits = 8):
     for i in range(digits):
         binary.append(0)
     return binary[::-1]
-data = np.array(generateData(10000), dtype=np.int32)
+data = np.array(generateData(50000), dtype=np.int32)
 
 X = data[:,0:17]
 y = data[:,17:]
