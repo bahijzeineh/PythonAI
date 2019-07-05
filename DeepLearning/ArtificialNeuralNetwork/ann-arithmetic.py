@@ -7,11 +7,11 @@ opf = [lambda m,n: m + n, lambda m,n: m * n]
 def generateData(size = 100):
     data = []
     for i in range(size):
-        x = randint(0,7)
-        y = randint(0,7)
+        x = randint(0,15)
+        y = randint(0,15)
         opi = randint(0,1)
         res = opf[opi](x, y)
-        data.append(genBinary(x) + [opi] + genBinary(y) + genBinary(res,64))
+        data.append(genBinary(x) + [opi] + genBinary(y) + genBinary(res))
     return data
 def genBinary(x, digits = 8):
     binary = []
@@ -46,19 +46,37 @@ model.add(Dropout(rate=0.1))
 model.add(Dense(activation = 'relu', units = 32, kernel_initializer = 'uniform'))
 model.add(Dropout(rate=0.2))
 
-model.add(Dense(activation = 'sigmoid', units = 64, kernel_initializer = 'uniform'))
+model.add(Dense(activation = 'relu', units = 32, kernel_initializer = 'uniform'))
+model.add(Dropout(rate=0.2))
+
+model.add(Dense(activation = 'relu', units = 32, kernel_initializer = 'uniform'))
+model.add(Dropout(rate=0.2))
+
+model.add(Dense(activation = 'sigmoid', units = 8, kernel_initializer = 'uniform'))
 
 model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
 
 # fit ann to training set
-model.fit(X_train, y_train, batch_size = 40, epochs = 80)
+model.fit(X_train, y_train, batch_size = 40, epochs = 3000)
 
 scores = model.evaluate(X_test, y_test)
 print("accuracy: ", scores[1] * 100)
 
 def prediction(x,y,o,r):
     test = np.array(genBinary(x) + [o] + genBinary(y)).reshape((1,17))
-    yt = genBinary(y, 64)
+    yt = np.array(genBinary(r))
     
     res = model.predict(test)
-    print(res == yt)
+    res = res > 0.7
+    
+    success = True
+    for i,col in enumerate(res[0]):
+        if (bool(col) and bool(yt[i])) or (not bool(col) and not bool(yt[i])):
+            pass
+        else:
+            success = False
+            break
+    print(success)
+    if not success:
+        print(yt)
+        print(res)
