@@ -24,7 +24,7 @@ def genBinary(x, digits = 8):
     for i in range(digits):
         binary.append(0)
     return binary[::-1]
-data = np.array(generateData(50000), dtype=np.int32)
+data = np.array(generateData(250000), dtype=np.int32)
 
 X = data[:,0:17]
 y = data[:,17:]
@@ -54,10 +54,12 @@ model.add(Dropout(rate=0.2))
 
 model.add(Dense(activation = 'sigmoid', units = 8, kernel_initializer = 'uniform'))
 
-model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+from keras.optimizers import Adam
+opt = Adam()
+model.compile(optimizer = opt, loss = 'binary_crossentropy', metrics = ['accuracy'])
 
 # fit ann to training set
-model.fit(X_train, y_train, batch_size = 40, epochs = 3000)
+model.fit(X_train, y_train, batch_size = 8, epochs = 5)
 
 scores = model.evaluate(X_test, y_test)
 print("accuracy: ", scores[1] * 100)
