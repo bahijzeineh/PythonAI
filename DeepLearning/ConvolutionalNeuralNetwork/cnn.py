@@ -21,7 +21,7 @@ from keras.optimizers import Adam
 
 from keras.preprocessing.image import ImageDataGenerator
 
-imgd = 96
+imgd = 128
 
 class CNN:
     def __init__(self, weightsFile = None, dropout = 0.2):
@@ -91,7 +91,7 @@ class CNN:
         self.model.fit_generator(
                 train_generator,
                 steps_per_epoch = 8000,
-                epochs = 2,
+                epochs = 3,
                 validation_data = test_generator,
                 validation_steps = 2000)
         return test_generator.class_indices
